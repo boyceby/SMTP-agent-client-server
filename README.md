@@ -1,4 +1,4 @@
-# SMTP-Agent-Client-Server
+# SMTP-agent-client-server
 #### Programs implementing Simple Mail Transfer Protocol (SMTP) mail agent, client, and server functionality using Python.
 
 This pair of programs implements the functionality required to send and receive email to and from different
