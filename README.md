@@ -9,10 +9,10 @@ for the sending of emails with subjects as well as MIME-encoded attachment files
 
 The mail agent and client functionalities are implemented by the single **agent_client.py** file, which, when
 provided a hostname and port number as arguments and executed, will prompt a user line-by-line via the
-command-line to enter data for the email desired to be sent. The user interface for this agent can be
-seen here:
+command-line to enter data for the email desired to be sent. The user interface for this agent (along with the
+response messages that were received by the client in this example) can be seen here:
 
-[image]
+![](smtp-agent-client-example.gif)
 
 The mail server functionality is implemented by the **server.py** file, which, when executed and provided a
 port number as a command-line argument, will initialize a "welcoming" TCP socket bound to the port number
