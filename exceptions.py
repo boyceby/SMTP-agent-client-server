@@ -25,7 +25,7 @@ class ParameterArgumentParsingError(ParsingError):
         a ParsingError results in its parameters or arguments failing to be recognized."""
     pass
 
-  class EarlyTerminationError(Exception):
+class EarlyTerminationError(Exception):
     """Exception raised when EOF is encountered before all required email data has been provided
         by the command-line user."""
     pass
