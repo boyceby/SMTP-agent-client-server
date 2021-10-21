@@ -2,6 +2,11 @@
 Email
 """
 
+import re
+import base64
+import mimetypes
+from socket import socket, AF_INET, SOCK_STREAM, getfqdn, gethostname
+
 class Email:
     """A class used by agent_client and server to temporarily store and manipulate email data as an email object."""
 
@@ -69,13 +74,18 @@ class Email:
                 raise EarlyTerminationError()
             else:
                 try:
-                    parse_mailbox(RemainingString(mailbox_input_string))
+                    mailbox_input_string_rem_string = RemainingString(mailbox_input_string)
+                    parse_mailbox(mailbox_input_string_rem_string)
                 except ParsingError as e:
                     print("Invalid <mailbox> provided for reverse-path: error parsing for <" 
                           + str(e) + "> production rule.")
                 else:
-                    self.set_reverse_path("<" + mailbox_input_string + ">")
-                    break
+                    if mailbox_input_string_rem_string.has_further_chars():
+                        print("Invalid <mailbox> provided for reverse-path: error parsing for <" 
+                              "mailbox> production rule.")
+                    else:
+                        self.set_reverse_path("<" + mailbox_input_string + ">")
+                        break
 
     def _fill_forward_paths(self):
         while True:
@@ -197,23 +207,18 @@ class Email:
         the case that an exception occurs while trying to receive from the client socket. Before raising
         any exceptions, this procedure will close the socket's connection and print a descriptive 1-line
         error message. The message types should be provided as strings based on the following tables:
-
             Expected Message Types:
-
                 220 response code greeting message -> "220"
                 221 response code closing message -> "221"
                 250 response code message -> "250"
                 354 response code message -> "354"
-
             Sent Message Types:
-
                 HELO message -> "HELO"
                 MAIL FROM command message -> "MAIL_FROM"
                 RCPT TO command message -> "RCPT_TO"
                 DATA command message -> "DATA"
                 Message data line messages -> "MESSAGE_DATA"
                 QUIT command message -> "QUIT"
-
         If no prior message was sent, provide None for sent_msg_type and sent_msg. In the case that
         the sent message type is of type "MESSAGE_DATA", None should be provided for sent_msg.
         """
@@ -293,7 +298,6 @@ class Email:
                 From: <reverse-path>
                 To: <forward-path-1>, <forward-path-2>, ..., <forward-path-n>
                 Subject: Arbitrary Subject Text
-
                 These are three sample SMTP message data body lines included
                 for illustrative purposes. Note the blank line preceding
                 these lines."""
@@ -308,23 +312,19 @@ class Email:
         """Generator generating line strings that, when iterated through, can be used collectively
             to obtain the ordered set of multipart MIME-encoded data lines representing the email
             at hand. The lines generated will be in the format:
-
                 From: <reverse-path>
                 To: <forward-path-1>, <forward-path-2>, ..., <forward-path-n>
                 Subject: Arbitrary Subject Text
                 MIME-Version: 1.0
                 Content-Type: multipart/mixed; boundary=98766789
-
                 --98766789
                 Content-Transfer-Encoding: quoted-printable
                 Content-Type: text/plain
-
                 These are two sample SMTP message data body lines included
                 for illustrative purposes.
                 --98766789
                 Content-Transfer-Encoding: base64
                 Content-Type: *DEPENDENT ON TYPE OF ATTACHMENT*
-
                 base64 encoding of attachment ---------------
                 ---------------------------------------------
                 ---------------------------------------------
