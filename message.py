@@ -2,6 +2,9 @@
 Message
 """
 
+from parse import *
+from exceptions import *
+
 class Message:
     """Class defining an object representative of a single application-layer SMTP message."""
 
