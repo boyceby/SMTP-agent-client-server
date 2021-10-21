@@ -1,7 +1,10 @@
 """
 SMTP Mail Agent/Client
 """
+
 import sys
+
+from email import Email
 from exceptions import EarlyTerminationError, SocketError, SMTPBreakOfProtocolError
 
 def SMTP_agent_client_engine():
