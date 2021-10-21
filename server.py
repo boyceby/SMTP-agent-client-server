@@ -8,16 +8,16 @@ from socket import socket, AF_INET, SOCK_STREAM, getfqdn, gethostname
 
 def SMTP_server_engine():
     """Engine for a SMTP mail server process.
-    This engine is primarily implemented as a state machine with five states: STATE_0, STATE_1, STATE_2, 
-    STATE_3, and STATE_4. In STATE_0, the state machine expects a 'HELO' message (and continues to STATE_1 
-    on receipt of one). In STATE_1, the state machine expects a 'MAIL FROM' command message (and continues 
-    to STATE_2 on receipt of one). In STATE_2, the state machine expects a 'RCPT TO' command (and continues 
-    to STATE_3 in receipt of one). In STATE_3, the state machine expects either a 'RCPT TO' command (remains 
-    at STATE_3) or a 'DATA' command (continues to STATE_4). In STATE_4, the state machine expects either a 
-    message data line (remains at STATE_4) or an end-of-message-data sequence (continues to STATE_1). In 
+    This engine is primarily implemented as a state machine with five states: STATE_0, STATE_1, STATE_2,
+    STATE_3, and STATE_4. In STATE_0, the state machine expects a 'HELO' message (and continues to STATE_1
+    on receipt of one). In STATE_1, the state machine expects a 'MAIL FROM' command message (and continues
+    to STATE_2 on receipt of one). In STATE_2, the state machine expects a 'RCPT TO' command (and continues
+    to STATE_3 in receipt of one). In STATE_3, the state machine expects either a 'RCPT TO' command (remains
+    at STATE_3) or a 'DATA' command (continues to STATE_4). In STATE_4, the state machine expects either a
+    message data line (remains at STATE_4) or an end-of-message-data sequence (continues to STATE_1). In
     addition, the state machine will accept and handle a valid 'QUIT' command in any one of its states.
     """
-    
+
     ########################## States ##########################
     # The states in which the state machine expects:
     STATE_0 = 0 # a 'HELO' message (continues to STATE_1)
@@ -32,7 +32,7 @@ def SMTP_server_engine():
     # "220 <server hostname + domain name>" greeting message
     GREETING_220_MSG = ("220 " + getfqdn() + "\n").encode()
     # "221 <server hostname> closing connection" message
-    CLOS_CON_221_MSG = ("221 " + gethostname() + " closing connection\n").encode() 
+    CLOS_CON_221_MSG = ("221 " + gethostname() + " closing connection\n").encode()
     # "250 Hello <client domain name> pleased to meet you" acknowledgement messsage start and end (unencoded)
     HELO_ACK_250_MSG_START_UNENC, HELO_ACK_250_MSG_END_UNENC = "250 Hello ", " pleased to meet you\n"
     # "250 OK" message
@@ -51,7 +51,7 @@ def SMTP_server_engine():
     ###############################################################################
 
     ############################## Main Server Mechanism ##############################
-  
+
     # Create welcoming socket, bind command-line-argument-specified
     # port number, and initiate TCP connection request listening process
     try:
@@ -88,16 +88,21 @@ def SMTP_server_engine():
             continue
 
         # Initiate state machine, receiving and sending messages through connection socket:
-        
+
         state = STATE_0
         current_email = Email()
+        sock_stream_rem_string = RemainingString("")
 
         while True:
 
             try:
 
-                # Receive client message
-                msg_str = recv_msg(connection_socket, state).decode()
+                # If necessary, draw from socket stream to obtain a complete client SMTP message
+                if not sock_stream_rem_string.contains_complete_msg():
+                    sock_stream_rem_string.append(recv_msg(connection_socket, state).decode())
+                    continue
+                else:
+                    msg_str = sock_stream_rem_string.consume_and_get_msg()
 
                 # Gather email data from client message, store email data when applicable,
                 # update state machine state as appropriate, and send relevant response
@@ -128,7 +133,7 @@ def SMTP_server_engine():
                         send_msg((HELO_ACK_250_MSG_START_UNENC
                             + client_address[0]
                             + HELO_ACK_250_MSG_END_UNENC).encode(),
-                            connection_socket) 
+                            connection_socket)
                         state = STATE_1
                         continue
 
@@ -242,7 +247,7 @@ def SMTP_server_engine():
             # (having already closed connection and alerted user)
             except SocketError:
                 break
-                
+
   ###################################################################################
 
 ############################## Helper procedures/functions ##############################
@@ -277,6 +282,7 @@ def recv_msg(connection_socket, state):
     return msg
 
 ##########################################################################################
+
 
 if __name__ == "__main__":
     SMTP_server_engine()
