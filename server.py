@@ -283,6 +283,5 @@ def recv_msg(connection_socket, state):
 
 ##########################################################################################
 
-
 if __name__ == "__main__":
     SMTP_server_engine()
