@@ -3,7 +3,6 @@ SMTP Mail Agent/Client
 """
 
 import sys
-
 from email import Email
 from exceptions import EarlyTerminationError, SocketError, SMTPBreakOfProtocolError
 
