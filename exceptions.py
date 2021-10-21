@@ -39,4 +39,3 @@ class SMTPBreakOfProtocolError(Exception):
     """Exception raised when a message breaking SMTP protocol has been sent from the client or received
     from the server."""
     pass
-  
