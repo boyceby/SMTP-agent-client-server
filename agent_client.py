@@ -2,6 +2,7 @@
 SMTP Mail Agent/Client
 """
 import sys
+from exceptions.py import EarlyTerminationError, SocketError, SMTPBreakOfProtocolError
 
 def SMTP_agent_client_engine():
     """Engine for prompting a command-line user for email data and sending the email using SMTP."""
