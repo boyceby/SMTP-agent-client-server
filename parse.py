@@ -50,6 +50,9 @@ NOTE: Each parsing function requires a RemainingString object, which is meant to
 unparsed portion of an original string.
 """
 
+import re
+from exceptions import *
+
 class RemainingString:
     """Wrapper class for the unparsed portion of a string."""
 
