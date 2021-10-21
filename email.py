@@ -7,6 +7,7 @@ import base64
 import mimetypes
 from socket import socket, AF_INET, SOCK_STREAM, getfqdn, gethostname
 from parse import *
+from exceptions import *
 
 class Email:
     """A class used by agent_client and server to temporarily store and manipulate email data as an email object."""
