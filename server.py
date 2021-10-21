@@ -5,6 +5,10 @@ SMTP Mail Server
 import re
 import sys
 from socket import socket, AF_INET, SOCK_STREAM, getfqdn, gethostname
+from email import Email
+from message import Message
+from parse import RemainingString
+from exceptions import *
 
 def SMTP_server_engine():
     """Engine for a SMTP mail server process.
