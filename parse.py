@@ -1,3 +1,4 @@
+
 """
 Parse
 
@@ -6,7 +7,6 @@ to parse SMTP messages, user input, and more. The module includes a number of
 production-rule-associated parsing functions for the following grammars:
 
     SMTP Client Messages:
-
                  <helo-msg> ::= "HELO" <whitespace> <domain> <nullspace> <CRLF>
             <mail-from-cmd> ::= “MAIL” <whitespace> “FROM:” <nullspace> <reverse-path>
                                 <nullspace> <CRLF>
@@ -37,21 +37,16 @@ production-rule-associated parsing functions for the following grammars:
                      <CRLF> ::= the newline character
                   <special> ::= "<" | ">" | "(" | ")" | "[" | "]" | "\" | "."
                                 | "," | ";" | ":" | "@" | '"'
-
     SMTP Server Response Messages:
-
              <response-code> ::= <resp-number> <whitespace> <arbitrary-text> <CRLF>
                <resp-number> ::= "250" | "354" | "500" | "501"
                 <whitespace> ::= <SP> | <SP> <whitespace>
                         <SP> ::= the space or tab character
             <arbitrary-text> ::= any sequence of one or more printable characters
                       <CRLF> ::= the newline character
-
     Miscellaneous:
-
         <comma-sep-mailboxes> ::= <mailbox> | <mailbox> "," <nullspace> <comma-sep-mailboxes>
         
-
 NOTE: Each parsing function requires a RemainingString object, which is meant to contain the 
 unparsed portion of an original string.
 """
@@ -75,6 +70,9 @@ class RemainingString:
         if self.is_empty():
             return ""
         return self._remaining_string[0]
+
+    def has_further_chars(self):
+        return True if self._remaining_string else False
  
 
 def parse_helo_msg(rs):
