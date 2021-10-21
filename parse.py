@@ -1,10 +1,9 @@
+
 """
 Parse
-
 This module provides the parsing mechanisms that both agent_client and server employ
 to parse SMTP messages, user input, and more. The module includes a number of
 production-rule-associated parsing functions for the following grammars:
-
     SMTP Client Messages:
                  <helo-msg> ::= "HELO" <whitespace> <domain> <nullspace> <CRLF>
             <mail-from-cmd> ::= “MAIL” <whitespace> “FROM:” <nullspace> <reverse-path>
@@ -45,8 +44,8 @@ production-rule-associated parsing functions for the following grammars:
                       <CRLF> ::= the newline character
     Miscellaneous:
         <comma-sep-mailboxes> ::= <mailbox> | <mailbox> "," <nullspace> <comma-sep-mailboxes>
-        
-NOTE: Each parsing function requires a RemainingString object, which is meant to contain the 
+
+NOTE: Each parsing function requires a RemainingString object, which is meant to contain the
 unparsed portion of an original string.
 """
 
@@ -75,7 +74,21 @@ class RemainingString:
 
     def has_further_chars(self):
         return True if self._remaining_string else False
- 
+
+    def append(self, string_to_append):
+        self._remaining_string = self._remaining_string + string_to_append
+
+    def contains_complete_msg(self):
+        """Returns as a Bool whether the current _remaining_string contains a candidate
+        SMTP message substring (a substring ending in a newline)."""
+        return True if re.match(".*?\n", self._remaining_string) is not None else False
+
+    def consume_and_get_msg(self):
+        """Consumes from the current _remaining_string and returns the first (and shortest)
+        candidate SMTP message substring in the current _remaining_string."""
+        msg_str = re.match(".*?\n", self._remaining_string)[0]
+        consume(".*?\n", self)
+        return msg_str
 
 def parse_helo_msg(rs):
     """
@@ -170,7 +183,7 @@ def parse_data_cmd(rs):
     else:
         raise MessageParsingError("data-cmd")
 
-        
+
 def parse_quit_cmd(rs):
     """
     <quit-cmd> ::= “QUIT” <nullspace> <CRLF>
@@ -308,7 +321,7 @@ def parse_string(rs):
     except ConsumptionError:
         raise ParsingError("string")
 
-     
+
 def parse_220_resp_code_msg(rs):
     """
     <220-resp-code-msg> ::= "220" <whitespace> <arbitrary-text> <CRLF>
@@ -358,7 +371,7 @@ def parse_354_resp_code_msg(rs):
     parse_whitespace(rs)
     parse_arbitrary_text(rs)
     parse_CRLF(rs)
-    
+
 
 def parse_arbitrary_text(rs):
     """
@@ -367,9 +380,9 @@ def parse_arbitrary_text(rs):
     try:
         consume("[ -~]+", rs)
     except ConsumptionError:
-        raise ParsingError("arbitrary-text")        
-        
-        
+        raise ParsingError("arbitrary-text")
+
+
 def parse_comma_sep_mailboxes(rs):
     """
     <comma-sep-mailboxes> ::= <mailbox> | <mailbox> "," <nullspace> <comma-sep-mailboxes>
@@ -384,7 +397,7 @@ def parse_comma_sep_mailboxes(rs):
             raise ParsingError("comma-sep-mailboxes")
         parse_nullspace(rs)
 
-        
+
 def consume(regexp, rs):
     """Attempts to match the provided regexp pattern with the beginning of the remaining message string.
         If there is a match, the matching portion of the remaining message string is removed (consumed).
